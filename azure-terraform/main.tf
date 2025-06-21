@@ -49,3 +49,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     version   = "latest"
   }
 }
+data "external" "next_instance" {
+  program = ["bash", "${path.module}/get_next_instance.sh"]
+}
