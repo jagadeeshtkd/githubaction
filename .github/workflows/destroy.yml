@@ -1,1 +1,56 @@
+name: Terraform Azure Infra
+
+on:
+  workflow_dispatch:  # Allows manual trigger
+    inputs:
+      action:
+        description: 'What do you want to do?'
+        required: true
+        default: 'apply'
+        type: choice
+        options:
+          - apply
+          - destroy
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+      ARM_CLIENT_SECRET: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+      ARM_SUBSCRIPTION_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
+      ARM_TENANT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}
+
+    defaults:
+      run:
+        working-directory: azure-terraform
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.6.6
+
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Run Apply or Destroy
+      run: |
+        if [ "${{ github.event.inputs.action }}" = "apply" ]; then
+          terraform plan
+          terraform apply -auto-approve
+        elif [ "${{ github.event.inputs.action }}" = "destroy" ]; then
+          terraform destroy -auto-approve
+        else
+          echo "Invalid action: ${{ github.event.inputs.action }}"
+          exit 1
+        fi
 
