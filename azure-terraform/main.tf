@@ -26,6 +26,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 resource "azurerm_linux_virtual_machine" "vm" {
+  count = 2
   name                = "${var.prefix}-${var.resource_type_vm}-${var.app_name}-${var.env}-${var.region}-${data.external.next_instance.result["next_instance"]}"
   location            = var.region
   resource_group_name = azurerm_resource_group.rg.name
