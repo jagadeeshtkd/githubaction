@@ -1,4 +1,4 @@
-name: Terraform Azure Infra
+name: Terraform Azure Infra apply or destroy
 
 on:
   workflow_dispatch:  # Allows manual trigger
