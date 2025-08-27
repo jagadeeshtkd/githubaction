@@ -19,11 +19,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download sqlpackage from Microsoft Download Center
+    - name: Install sqlpackage using Chocolatey
       shell: powershell
       run: |
-        $url = "https://download.microsoft.com/download/6/3/6/636A1B6C-2F83-4F80-9A08-687A1D0F2F2C/sqlpackage-win-x64-en-US.zip"
-        $zipPath = "$env:RUNNER_TEMP\sqlpackage.zip"
-        curl.exe -L $url -o $zipPath
-        Expand-Archive -Path $zipPath -DestinationPath "$env:RUNNER_TEMP\sqlpackage"
-        Add-Content -Path $env:GITHUB_PATH -Value "$env:RUNNER_TEMP\sqlpackage"
+        choco install sqlpackage -y
+        $sqlPackagePath = "${env:ProgramFiles}\SqlPackage"
+        Add-Content -Path $env:GITHUB_PATH -Value $sqlPackagePath
