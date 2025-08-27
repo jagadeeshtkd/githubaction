@@ -19,14 +19,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download sqlpackage.exe
+    - name: Download sqlpackage from Microsoft Download Center
       shell: powershell
       run: |
-        Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-win" -OutFile "$env:RUNNER_TEMP\sqlpackage.zip"
-        if ((Get-Item "$env:RUNNER_TEMP\sqlpackage.zip").Length -gt 0) {
-          Expand-Archive -Path "$env:RUNNER_TEMP\sqlpackage.zip" -DestinationPath "$env:RUNNER_TEMP\sqlpackage"
-          Add-Content -Path $env:GITHUB_PATH -Value "$env:RUNNER_TEMP\sqlpackage"
-        } else {
-          Write-Error "sqlpackage.zip download failed or is empty."
-          exit 1
-        }
+        $url = "https://download.microsoft.com/download/6/3/6/636A1B6C-2F83-4F80-9A08-687A1D0F2F2C/sqlpackage-win-x64-en-US.zip"
+        $zipPath = "$env:RUNNER_TEMP\sqlpackage.zip"
+        curl.exe -L $url -o $zipPath
+        Expand-Archive -Path $zipPath -DestinationPath "$env:RUNNER_TEMP\sqlpackage"
+        Add-Content -Path $env:GITHUB_PATH -Value "$env:RUNNER_TEMP\sqlpackage"
