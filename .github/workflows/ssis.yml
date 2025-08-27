@@ -1,0 +1,26 @@
+name: SSIS Package Deployment to Azure SQL Managed Instance
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-ssis:
+    name: Deploy SSIS to Azure SQL MI
+    runs-on: windows-latest
+
+    env:
+      SSIS_ISPAC_PATH: 'path/to/your/package.ispac' # Update this path
+      AZURE_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }} # MI hostname
+      AZURE_SQL_DB: 'SSISDB'
+      AZURE_SQL_USER: ${{ secrets.AZURE_SQL_USER }}
+      AZURE_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download sqlpackage.exe
+      run: |
+        Invoke-WebRequest -Uri "https://aka.ms/sqlpackage-win" -OutFile "sqlpackage.zip"
+        Expand-Archive -Path "sqlpackage.zip" -DestinationPath "$env:RUNNER_TEMP\sqlpackage"
+        $env:PATH += ";$env:RUNNER_TEMP\sqlpackage"
